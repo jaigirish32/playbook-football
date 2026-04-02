@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+/* ── Google Fonts ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
+
+/* ── CSS Variables — Light Theme ─────────────────────────── */
+:root {
+  --bg-primary:     #f5f4f0;
+  --bg-secondary:   #ffffff;
+  --bg-card:        #ffffff;
+  --bg-header:      #1a1a2e;
+  --bg-table-head:  #1a1a2e;
+  --bg-table-alt:   #f0eeea;
+  --bg-accent:      #e8b000;
+
+  --text-primary:   #0d0d0d;
+  --text-secondary: #3a3a3a;
+  --text-muted:     #777777;
+  --text-on-dark:   #ffffff;
+  --text-accent:    #e8b000;
+  --text-win:       #1a7a3c;
+  --text-loss:      #c0392b;
+
+  --border:         #d8d5ce;
+  --border-accent:  #e8b000;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.12);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.16);
+
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+
+  --good-bg:    #e8f5e9;
+  --good-text:  #1b5e20;
+  --bad-bg:     #fff3e0;
+  --bad-text:   #e65100;
+  --ugly-bg:    #fce4ec;
+  --ugly-text:  #880e4f;
+}
+
+/* ── CSS Variables — Dark Theme ──────────────────────────── */
+[data-theme="dark"] {
+  --bg-primary:     #0d0d0d;
+  --bg-secondary:   #161616;
+  --bg-card:        #1c1c1c;
+  --bg-header:      #0a0a0a;
+  --bg-table-head:  #111111;
+  --bg-table-alt:   #222222;
+  --bg-accent:      #e8b000;
+
+  --text-primary:   #f0ede8;
+  --text-secondary: #c8c4bc;
+  --text-muted:     #888888;
+  --text-on-dark:   #ffffff;
+  --text-accent:    #e8b000;
+  --text-win:       #4caf50;
+  --text-loss:      #ef5350;
+
+  --border:         #2a2a2a;
+  --border-accent:  #e8b000;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.6);
+
+  --good-bg:    #1a2e1c;
+  --good-text:  #81c784;
+  --bad-bg:     #2e1f0a;
+  --bad-text:   #ffb74d;
+  --ugly-bg:    #2e0d1a;
+  --ugly-text:  #f48fb1;
+}
+
+/* ── Base ─────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.2s, color 0.2s;
+  min-height: 100vh;
+}
+
+/* ── Typography ───────────────────────────────────────────── */
+.font-display   { font-family: 'Oswald', sans-serif; }
+.font-condensed { font-family: 'Barlow Condensed', sans-serif; }
+.font-body      { font-family: 'Barlow', sans-serif; }
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 3px; }
+
+/* ── Utility classes ──────────────────────────────────────── */
+.win  { color: var(--text-win); font-weight: 600; }
+.loss { color: var(--text-loss); font-weight: 600; }
+.push { color: var(--text-muted); }
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.section-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-on-dark);
+  background: var(--bg-table-head);
+  padding: 8px 12px;
+  border-bottom: 3px solid var(--border-accent);
+}
+
+.stat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.85rem;
+}
+
+.stat-table th {
+  background: var(--bg-table-head);
+  color: var(--text-accent);
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 8px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.stat-table td {
+  padding: 5px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.stat-table tr:nth-child(even) td {
+  background: var(--bg-table-alt);
+}
+
+.stat-table tr:hover td {
+  background: color-mix(in srgb, var(--border-accent) 10%, transparent);
+}
+
+/* ── Animations ───────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeIn 0.3s ease forwards; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+.animate-pulse { animation: pulse 1.5s ease-in-out infinite; }

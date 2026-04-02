@@ -1,0 +1,22 @@
+services:
+
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: playbook_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: playbook
+      POSTGRES_USER: playbook_user
+      POSTGRES_PASSWORD: localpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U playbook_user -d playbook"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

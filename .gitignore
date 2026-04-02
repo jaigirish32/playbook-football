@@ -1,0 +1,47 @@
+# Secrets
+backend/.env
+.env
+
+# Python virtual environment
+backend/venv/
+venv/
+
+# Python cache
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+"@ | Set-Content C:\mywork\playbook-football\.gitignore
+
+# Now add only what we want
+git add .gitignore
+git add backend/app/
+git add backend/main.py
+git add backend/ingest.py
+git add backend/requirements.txt
+git add frontend/src/
+git add frontend/package.json
+git add frontend/package-lock.json
+git add frontend/vite.config.js
+git add frontend/index.html
+git add docker-compose.yml

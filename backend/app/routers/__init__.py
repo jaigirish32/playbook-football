@@ -1,0 +1,1 @@
+from app.routers import auth, teams, stats, coaches, chat, admin
