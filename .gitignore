@@ -45,3 +45,6 @@ git add frontend/package-lock.json
 git add frontend/vite.config.js
 git add frontend/index.html
 git add docker-compose.yml
+node_modules/
+package-lock.json
+package.json
