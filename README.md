@@ -1,10 +1,10 @@
-# 🏈 Playbook Football
+#  Playbook Football
 
 A full-stack NFL & CFB sports analytics web application that ingests data from the Playbook Sports PDF and presents comprehensive team statistics, ATS history, schedules, draft information, and AI-powered chat.
 
 ---
 
-## 🚀 Tech Stack
+##  Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -19,7 +19,7 @@ A full-stack NFL & CFB sports analytics web application that ingests data from t
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 playbook-football/
@@ -45,7 +45,7 @@ playbook-football/
 
 ---
 
-## ⚙️ Setup
+##  Setup
 
 ### 1. Prerequisites
 - Python 3.12+
@@ -87,7 +87,7 @@ npm run dev
 
 ---
 
-## 📊 Data Ingestion
+##  Data Ingestion
 
 The `ingest.py` CLI parses the Playbook Sports PDF into the database.
 
@@ -141,7 +141,7 @@ python ingest.py --pdf PATH_TO_PDF --cfb-ats-history-team "Alabama"
 
 ---
 
-## 🗄️ Database Tables
+##  Database Tables
 
 | Table | Description |
 |---|---|
@@ -158,7 +158,7 @@ python ingest.py --pdf PATH_TO_PDF --cfb-ats-history-team "Alabama"
 
 ---
 
-## 🌐 API Endpoints
+##  API Endpoints
 
 | Endpoint | Description |
 |---|---|
@@ -175,7 +175,7 @@ python ingest.py --pdf PATH_TO_PDF --cfb-ats-history-team "Alabama"
 
 ---
 
-## 📱 Features
+##  Features
 
 ### NFL Teams
 - 4-year statistical review
@@ -203,7 +203,7 @@ python ingest.py --pdf PATH_TO_PDF --cfb-ats-history-team "Alabama"
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/playbook
@@ -217,7 +217,7 @@ SECRET_KEY=your-secret-key
 
 ---
 
-## 👤 Default Admin
+##  Default Admin
 
 ```
 Email: admin@playbook.com
