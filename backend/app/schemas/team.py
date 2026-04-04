@@ -13,6 +13,7 @@ class TeamCreate(BaseModel):
     stadium_surface  : str | None = None
     stadium_city     : str | None = None
     stadium_capacity : int | None = None
+    nickname         : str | None = None
     website          : str | None = None
     logo_url         : str | None = None
 
@@ -26,6 +27,7 @@ class TeamUpdate(BaseModel):
     stadium_surface  : str | None = None
     stadium_city     : str | None = None
     stadium_capacity : int | None = None
+    nickname         : str | None = None
     website          : str | None = None
     logo_url         : str | None = None
 
@@ -66,6 +68,7 @@ class TeamOut(BaseModel):
     stadium_surface  : str | None
     stadium_city     : str | None
     stadium_capacity : int | None
+    nickname         : str | None = None
     website          : str | None
     logo_url         : str | None
     coach            : CoachSummary | None

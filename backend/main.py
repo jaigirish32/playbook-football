@@ -21,6 +21,7 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     enable_pgvector()
+    Base.metadata.create_all(bind=engine)
     print("✓ pgvector enabled")
     yield
     # Runs once on shutdown — nothing to clean up
@@ -38,11 +39,7 @@ app = FastAPI(
 
 
 # ── CORS ──────────────────────────────────────────────────────
-origins = (
-    ["http://localhost:5173"]   # Vite dev server
-    if settings.debug
-    else ["https://yourdomain.com"]
-)
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -89,3 +86,4 @@ if not settings.debug:
         @app.get("/{full_path:path}", include_in_schema=False)
         async def serve_react(full_path: str):
             return FileResponse(f"{frontend_dist}/index.html")
+

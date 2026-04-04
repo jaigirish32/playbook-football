@@ -47,6 +47,7 @@ class Team(Base):
     draft_picks    : Mapped[list["DraftPick"]]    = relationship("DraftPick",    back_populates="team", cascade="all, delete-orphan")
     playbook: Mapped[list["TeamPlaybook"]] = relationship("TeamPlaybook", back_populates="team")
     ats_history: Mapped[list["ATSHistory"]] = relationship("ATSHistory", back_populates="team")
+    nickname : Mapped[str | None] = mapped_column(String(100))
     __table_args__ = (
         UniqueConstraint("abbreviation", "league", name="uq_team_abbr_league"),
     )

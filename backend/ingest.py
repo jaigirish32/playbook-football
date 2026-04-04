@@ -3860,6 +3860,144 @@ def parse_nfl_draft_analysis(result, abbr: str, teams: dict, db) -> bool:
     print(f"  ✓ Draft analysis: {abbr} grades={bool(draft_grades)} first_round={bool(first_round)} steal={bool(steal_of_draft)}")
     return True
 
+def parse_cfb_stadiums(result, name: str, teams: dict, db) -> bool:
+    """
+    Parse stadium, nickname, full conference, and website from CFB team page.
+    Line format:
+      Line 0: Team name (ALABAMA)
+      Line 6: Nickname (CRIMSON TIDE)
+      Line 9: Stadium (Bryant-Denny Stadium (Grass) • Capacity: 100,077 • Tuscaloosa, AL)
+      Line 11: Conference ... 4 YEAR STATISTICAL REVIEW ... www.rolltide.com
+    """
+    import re
+    from sqlalchemy import text
+
+    team = teams.get(name)
+    if not team:
+        print(f"  ✗ CFB team not found: {name}")
+        return False
+
+    # Get raw lines from page (not stripped — to find website at end)
+    raw_lines = []
+    lines = []
+    for page in result.pages:
+        raw_lines = [l.content for l in page.lines]
+        lines = [l.strip() for l in raw_lines]
+        break
+
+    stadium = None
+    surface = None
+    capacity = None
+    city = None
+    nickname = None
+    full_conference = None
+    website = None
+
+    skip_patterns = [
+        r'^\d+', r'^RPR', r'OFF\s*/\s*DEF', r'SU\s*[•·]', r'Recruit Rank',
+        r'Year$', r'^\*', r'Coach', r'Record With', r'^4 YEAR'
+    ]
+    team_name_upper = name.upper()
+    found_team_name = False
+
+    for i, line in enumerate(lines[:25]):
+        if not line:
+            continue
+
+        # Skip team name
+        if line.upper() == team_name_upper or line.upper().startswith(team_name_upper):
+            found_team_name = True
+            continue
+
+        # Stadium with surface
+        m = re.search(
+            r'(.+?)\s*\(([^)]+)\)\s*[•·\.]\s*Capacity:\s*([\d,]+)\s*[•·\.]\s*(.+)',
+            line, re.IGNORECASE
+        )
+        if m:
+            stadium  = m.group(1).strip()
+            surface  = m.group(2).strip()
+            capacity = int(m.group(3).replace(',', ''))
+            city     = m.group(4).strip()
+            continue
+
+        # Stadium without surface
+        m2 = re.search(
+            r'(.+?)\s*[•·\.]\s*Capacity:\s*([\d,]+)\s*[•·\.]\s*(.+)',
+            line, re.IGNORECASE
+        )
+        if m2 and not stadium:
+            stadium  = m2.group(1).strip()
+            capacity = int(m2.group(2).replace(',', ''))
+            city     = m2.group(3).strip()
+            continue
+
+        # Nickname — ALL CAPS, after team name, BEFORE stadium line
+        if (found_team_name and
+            nickname is None and
+            stadium is None and  # ← only before stadium found
+            re.match(r'^[A-Z][A-Z\s]+$', line) and
+            2 < len(line) < 40 and
+            not re.search(r'\d', line) and
+            not any(re.search(p, line, re.IGNORECASE) for p in skip_patterns)):
+            nickname = line.strip()
+
+        # Conference + website line (e.g. "Southeastern Conference   4 YEAR...   www.rolltide.com")
+        if re.search(r'Conference|Independent|Association', line, re.IGNORECASE):
+            # Extract full conference name (first part before 4 YEAR)
+            conf_m = re.match(r'^([A-Za-z0-9\s\-]+(?:Conference|Independent|Association))', line, re.IGNORECASE)
+            if conf_m:
+                full_conference = conf_m.group(1).strip()
+            # Extract website from raw line (at the end)
+            raw = raw_lines[i] if i < len(raw_lines) else line
+            web_m = re.search(r'(www\.[a-z0-9\.\-]+)', raw, re.IGNORECASE)
+            if web_m:
+                website = web_m.group(1).strip()
+            continue
+
+        # Website — standalone www. line
+        if re.match(r'^www\.', line, re.IGNORECASE):
+            website = line.strip()
+            continue
+        # Nickname — ALL CAPS, after team name AND after seeing year/SU record
+        if (found_team_name and
+            nickname is None and
+            re.match(r'^[A-Z][A-Z\s]+$', line) and
+            2 < len(line) < 40 and
+            not re.search(r'\d', line) and
+            not any(re.search(p, line, re.IGNORECASE) for p in skip_patterns) and
+            # Must come after SU record or year line (indicates coach section passed)
+            any(re.search(r'SU|Year|Record', lines[j], re.IGNORECASE)
+                for j in range(i) if j < len(lines) and lines[j])):
+            nickname = line.strip()
+
+    if not stadium and not nickname:
+        print(f"  ✗ No data found for {name}")
+        return False
+
+    db.execute(text("""
+        UPDATE teams SET
+            stadium          = :stadium,
+            stadium_surface  = :surface,
+            stadium_capacity = :capacity,
+            stadium_city     = :city,
+            nickname         = :nickname,
+            conference       = COALESCE(:full_conf, conference),
+            website          = :website
+        WHERE id = :tid
+    """), {
+        'tid'      : str(team.id),
+        'stadium'  : stadium,
+        'surface'  : surface,
+        'capacity' : capacity,
+        'city'     : city,
+        'nickname' : nickname,
+        'full_conf': full_conference,
+        'website'  : website,
+    })
+    db.commit()
+    print(f"  ✓ {name}: nickname={nickname} conf={full_conference} web={website} stadium={stadium}")
+    return True
 
 
 # ── Step 5: Generate embeddings ───────────────────────────────
@@ -3906,7 +4044,7 @@ def main():
     parser.add_argument("--cfb-ats-history-team",  type=str,            help="Parse CFB 10-year ATS history single team")
     parser.add_argument("--nfl-draft-analysis", action="store_true", help="Parse NFL draft grades, first round, steal of draft")
     parser.add_argument("--nfl-draft-analysis-team", type=str, help="Parse draft analysis for single NFL team e.g. ARI")
-
+    parser.add_argument("--cfb-stadiums", action="store_true", help="Parse CFB stadium info for all teams")
     args = parser.parse_args()
 
     enable_pgvector()
@@ -4042,6 +4180,18 @@ def main():
             print("✓ NFL draft analysis complete")
             return
 
+        elif args.cfb_stadiums:
+            print("\n── Parsing CFB Stadium Info ──────────────────────────")
+            cfb_teams = {t.name: t for t in db.query(Team).filter(Team.league == 'CFB').all()}
+            for name, page in CFB_TEAM_PAGES.items():
+                try:
+                    result = analyze_pages(args.pdf, str(page))
+                    parse_cfb_stadiums(result, name, cfb_teams, db)
+                except Exception as e:
+                    db.rollback()
+                    print(f"  ✗ {name} failed: {e}")
+            print("✓ CFB stadium info complete")
+            return
 
         elif args.cfb_ats_history_team:
             name = args.cfb_ats_history_team

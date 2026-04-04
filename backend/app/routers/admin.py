@@ -4,6 +4,8 @@ from app.core.dependencies import get_db, require_admin
 from app.repositories.user_repo import get_all_users, deactivate_user
 from app.repositories.chat_repo import clean_expired_cache
 from app.schemas.user import UserOut
+import subprocess, os, tempfile
+from fastapi import UploadFile, File
 
 router = APIRouter()
 
@@ -43,3 +45,36 @@ def clean_cache(
 ):
     deleted = clean_expired_cache(db)
     return {"deleted": deleted}
+
+@router.post("/restore-db")
+async def restore_db(
+    file: UploadFile = File(...),
+):
+    db_url = os.getenv('DATABASE_URL')
+    content = await file.read()
+    
+    with tempfile.NamedTemporaryFile(suffix='.sql', delete=False) as f:
+        f.write(content)
+        tmp_path = f.name
+    
+    try:
+        # Drop all tables first
+        drop_result = subprocess.run(
+            ['psql', db_url, '-c', 
+             'DROP SCHEMA public CASCADE; CREATE SCHEMA public; CREATE EXTENSION IF NOT EXISTS vector;'],
+            capture_output=True, text=True
+        )
+        
+        # Restore
+        result = subprocess.run(
+            ['psql', db_url, '-f', tmp_path],
+            capture_output=True, text=True, timeout=300
+        )
+        return {
+            "returncode": result.returncode,
+            "drop": drop_result.stderr[-500:],
+            "stdout": result.stdout[-2000:],
+            "stderr": result.stderr[-1000:]
+        }
+    finally:
+        os.unlink(tmp_path)

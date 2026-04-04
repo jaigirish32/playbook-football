@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     # Auth
     secret_key: str = "change-this-in-production"
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 10080
     algorithm: str = "HS256"
 
     # App

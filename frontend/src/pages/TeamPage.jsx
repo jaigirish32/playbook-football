@@ -206,34 +206,52 @@ export default function TeamPage() {
 /* ── Team Header ───────────────────────────────────────────── */
 function TeamHeader({ team, coach, league }) {
   return (
-    <div style={{ background: 'var(--bg-header)', borderRadius: 'var(--radius-md)', padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', borderBottom: '3px solid var(--border-accent)' }}>
-      <div style={{ width: '90px', height: '90px', flexShrink: 0 }}>
+    <div style={{ background: 'var(--bg-header)', borderRadius: 'var(--radius-md)', borderBottom: '3px solid var(--border-accent)', overflow: 'hidden', display: 'flex', alignItems: 'stretch', flexWrap: 'wrap' }}>
+      {/* Logo */}
+      <div style={{ width: '90px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px', background: '#ffffff05' }}>
         <img
           src={league === 'NFL'
             ? `https://a.espncdn.com/i/teamlogos/nfl/500/${team.abbreviation.toLowerCase()}.png`
             : `https://a.espncdn.com/i/teamlogos/ncaa/500/scoreboard/${team.abbreviation.toLowerCase()}.png`
           }
           alt={team.name}
-          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          style={{ width: '70px', height: '70px', objectFit: 'contain' }}
           onError={(e) => { e.target.style.display = 'none' }}
         />
       </div>
-      <div style={{ flex: 1, minWidth: '200px' }}>
-        <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: '2.5rem', fontWeight: '700', color: 'var(--text-accent)', letterSpacing: '0.05em', lineHeight: 1 }}>{team.abbreviation}</div>
-        <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: '1.1rem', color: '#ffffff99', letterSpacing: '0.08em', marginTop: '4px' }}>{team.name}</div>
+      {/* Team info */}
+      <div style={{ flex: 1, minWidth: '200px', padding: '14px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderLeft: '1px solid #ffffff11' }}>
+        <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: '2rem', fontWeight: '700', color: 'var(--text-accent)', letterSpacing: '0.08em', lineHeight: 1, textTransform: 'uppercase' }}>{team.name.toUpperCase()}</div>
+        {team.nickname  && league === 'CFB'&& (
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: '0.95rem', color: '#ffffff66', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '2px' }}>
+            {team.nickname}
+          </div>
+        )}
         {team.conference && (
-          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: '0.8rem', color: '#ffffff44', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '6px' }}>
-            {team.conference} • {team.division}
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: '0.72rem', color: '#ffffff44', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '4px' }}>
+            {league === 'NFL' 
+              ? (team.division ? `${team.division} Division` : team.conference)
+              : (team.conference || '')
+            }
           </div>
         )}
         {team.stadium && (
-          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: '0.8rem', color: '#ffffff44', marginTop: '4px' }}>
-            {team.stadium} {team.stadium_city && `• ${team.stadium_city}`}
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: '0.78rem', color: '#ffffff55', marginTop: '6px' }}>
+            {team.stadium}
+            {team.stadium_capacity ? ` (${team.stadium_surface || ''}) • Capacity: ${team.stadium_capacity.toLocaleString()}` : ''}
+            {team.stadium_city ? ` • ${team.stadium_city}` : ''}
+          </div>
+        )}
+        {team.website && (
+          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: '0.72rem', color: '#ffffff33', marginTop: '4px' }}>
+            <a href={`https://${team.website}`} target="_blank" rel="noopener noreferrer" style={{ color: '#ffffff33', textDecoration: 'none' }}>
+              {team.website}
+            </a>
           </div>
         )}
       </div>
       {coach && (
-        <div style={{ background: '#ffffff08', border: '1px solid #ffffff11', borderRadius: '6px', padding: '12px 16px', minWidth: '200px' }}>
+        <div style={{ background: '#ffffff08', border: '1px solid #ffffff11', padding: '12px 16px', minWidth: '200px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: '0.7rem', color: '#ffffff44', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '4px' }}>Head Coach</div>
           <div style={{ fontFamily: 'Oswald, sans-serif', fontSize: '1rem', fontWeight: '600', color: '#fff' }}>{coach.name}</div>
           {coach.years_with_team && <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: '0.8rem', color: '#ffffff66', marginTop: '2px' }}>Year {coach.years_with_team}</div>}
