@@ -219,6 +219,6 @@ SECRET_KEY=your-secret-key
 
 ##  Default Admin
 
-```
+https://lively-bay-055ee4d0f.4.azurestaticapps.net/
 Email: admin@playbook.com
 Password: admin123
